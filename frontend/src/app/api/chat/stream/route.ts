@@ -17,13 +17,9 @@ Rules:
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { message, messages, topic, difficulty, mode } = body;
-
   const userMessages = messages || [{ role: "user", content: message }];
 
-  const systemPrompt = `${SOCRATIC_PROMPT}
-
-**Session context:** Subject: **${topic || "Math"}**. Difficulty: **${difficulty || "Intermediate"}**.
-**Mode:** ${mode || "socratic"}`;
+  const systemPrompt = `${SOCRATIC_PROMPT}\n\n**Session context:** Subject: **${topic || "Math"}**. Difficulty: **${difficulty || "Intermediate"}**.\n**Mode:** ${mode || "socratic"}`;
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -33,15 +29,35 @@ export async function POST(req: NextRequest) {
     },
     body: JSON.stringify({
       model: OPENAI_MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...userMessages,
-      ],
+      messages: [{ role: "system", content: systemPrompt }, ...userMessages],
       stream: true,
     }),
   });
 
-  return new Response(response.body, {
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n").filter(l => l.startsWith("data: "));
+        for (const line of lines) {
+          const data = line.slice(6);
+          if (data === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(data);
+            const text = parsed.choices[0]?.delta?.content || "";
+            if (text) controller.enqueue(new TextEncoder().encode(text));
+          } catch {}
+        }
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
     headers: { "Content-Type": "text/plain; charset=utf-8" },
   });
 }
