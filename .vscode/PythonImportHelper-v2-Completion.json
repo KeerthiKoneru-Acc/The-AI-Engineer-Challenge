@@ -1,0 +1,104 @@
+[
+    {
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "CORSMiddleware",
+        "importPath": "fastapi.middleware.cors",
+        "description": "fastapi.middleware.cors",
+        "isExtraImport": true,
+        "detail": "fastapi.middleware.cors",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "OpenAI",
+        "importPath": "openai",
+        "description": "openai",
+        "isExtraImport": true,
+        "detail": "openai",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "ChatRequest",
+        "kind": 6,
+        "importPath": "api.index",
+        "description": "api.index",
+        "peekOfCode": "class ChatRequest(BaseModel):\n    message: str\n@app.get(\"/\")\ndef root():\n    return {\"status\": \"ok\"}\n@app.post(\"/api/chat\")\ndef chat(request: ChatRequest):\n    if not os.getenv(\"OPENAI_API_KEY\"):\n        raise HTTPException(status_code=500, detail=\"OPENAI_API_KEY not configured\")\n    try:",
+        "detail": "api.index",
+        "documentation": {}
+    },
+    {
+        "label": "root",
+        "kind": 2,
+        "importPath": "api.index",
+        "description": "api.index",
+        "peekOfCode": "def root():\n    return {\"status\": \"ok\"}\n@app.post(\"/api/chat\")\ndef chat(request: ChatRequest):\n    if not os.getenv(\"OPENAI_API_KEY\"):\n        raise HTTPException(status_code=500, detail=\"OPENAI_API_KEY not configured\")\n    try:\n        user_message = request.message\n        response = client.chat.completions.create(\n            model=\"gpt-5\",",
+        "detail": "api.index",
+        "documentation": {}
+    },
+    {
+        "label": "chat",
+        "kind": 2,
+        "importPath": "api.index",
+        "description": "api.index",
+        "peekOfCode": "def chat(request: ChatRequest):\n    if not os.getenv(\"OPENAI_API_KEY\"):\n        raise HTTPException(status_code=500, detail=\"OPENAI_API_KEY not configured\")\n    try:\n        user_message = request.message\n        response = client.chat.completions.create(\n            model=\"gpt-5\",\n            messages=[\n                {\"role\": \"system\", \"content\": \"You are a supportive mental coach.\"},\n                {\"role\": \"user\", \"content\": user_message}",
+        "detail": "api.index",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "api.index",
+        "description": "api.index",
+        "peekOfCode": "app = FastAPI()\n# CORS so the frontend can talk to backend\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"]\n)\nclient = OpenAI(api_key=os.getenv(\"OPENAI_API_KEY\"))\nclass ChatRequest(BaseModel):",
+        "detail": "api.index",
+        "documentation": {}
+    },
+    {
+        "label": "client",
+        "kind": 5,
+        "importPath": "api.index",
+        "description": "api.index",
+        "peekOfCode": "client = OpenAI(api_key=os.getenv(\"OPENAI_API_KEY\"))\nclass ChatRequest(BaseModel):\n    message: str\n@app.get(\"/\")\ndef root():\n    return {\"status\": \"ok\"}\n@app.post(\"/api/chat\")\ndef chat(request: ChatRequest):\n    if not os.getenv(\"OPENAI_API_KEY\"):\n        raise HTTPException(status_code=500, detail=\"OPENAI_API_KEY not configured\")",
+        "detail": "api.index",
+        "documentation": {}
+    }
+]
