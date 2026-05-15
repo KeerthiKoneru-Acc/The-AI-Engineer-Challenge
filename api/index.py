@@ -8,14 +8,14 @@ for the Next.js frontend (Fetch + ReadableStream).
 from __future__ import annotations
 
 import os
-from typing import AsyncIterator, Literal
+from typing import AsyncIterator, Literal, Self
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI, OpenAI
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
 
 load_dotenv()
 
@@ -135,12 +135,34 @@ class ChatMessage(BaseModel):
 
 
 class StreamChatRequest(BaseModel):
-    """Request body for ``POST /api/chat/stream``."""
+    """
+    Request body for streaming chat (``POST /api/chat/stream`` or ``POST /chat/stream``).
+
+    Send either ``messages`` (full history) or a single ``message`` for one user turn.
+    ``mode`` is accepted as an alias for ``tutor_mode`` (e.g. ``socratic``, ``hint``, ``explanation``).
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     topic: str = "Math"
     difficulty: str = "Intermediate"
-    tutor_mode: TutorMode = "socratic"
-    messages: list[ChatMessage] = Field(..., min_length=1)
+    tutor_mode: TutorMode = Field(
+        default="socratic",
+        validation_alias=AliasChoices("tutor_mode", "mode"),
+    )
+    messages: list[ChatMessage] | None = None
+    message: str | None = None
+
+    @model_validator(mode="after")
+    def _messages_from_single_turn(self) -> Self:
+        if self.messages:
+            if len(self.messages) < 1:
+                raise ValueError("messages must be a non-empty list when provided")
+            return self
+        if self.message is not None and self.message.strip():
+            self.messages = [ChatMessage(role="user", content=self.message.strip())]
+            return self
+        raise ValueError("Provide either messages (non-empty) or message")
 
 
 class ChatRequest(BaseModel):
@@ -148,11 +170,41 @@ class ChatRequest(BaseModel):
 
 
 def _openai_messages_from_request(body: StreamChatRequest) -> list[dict[str, str]]:
+    msgs = body.messages
+    assert msgs is not None
     system = build_system_prompt(body.topic, body.difficulty, body.tutor_mode)
     out: list[dict[str, str]] = [{"role": "system", "content": system}]
-    for m in body.messages:
+    for m in msgs:
         out.append({"role": m.role, "content": m.content})
     return out
+
+
+def _stream_chat_response(body: StreamChatRequest) -> StreamingResponse:
+    """Shared streaming handler for both ``/api/chat/stream`` and ``/chat/stream``."""
+    if not _api_key():
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+
+    messages = _openai_messages_from_request(body)
+
+    async def token_iter() -> AsyncIterator[str]:
+        try:
+            aclient = get_async_client()
+            stream = await aclient.chat.completions.create(
+                model=_model(),
+                messages=messages,
+                stream=True,
+            )
+            async for chunk in stream:
+                choice = chunk.choices[0]
+                if choice.delta and choice.delta.content:
+                    yield choice.delta.content
+        except Exception as e:
+            yield f"\n\n[Stream error: {e!s}]"
+
+    return StreamingResponse(
+        token_iter(),
+        media_type="text/plain; charset=utf-8",
+    )
 
 
 @app.get("/")
@@ -161,11 +213,13 @@ def root():
 
 
 @app.get("/api/health")
+@app.get("/health")
 def health():
     return {"status": "ok"}
 
 
 @app.post("/api/chat")
+@app.post("/chat")
 def chat(request: ChatRequest):
     """Non-streaming JSON chat (legacy / simple clients)."""
     if not _api_key():
@@ -190,34 +244,14 @@ def chat(request: ChatRequest):
 
 
 @app.post("/api/chat/stream")
-async def chat_stream(body: StreamChatRequest):
+@app.post("/chat/stream")
+def chat_stream(body: StreamChatRequest):
     """
     Stream assistant tokens as **plain UTF-8 text** (not SSE).
 
+    Registered at **both** ``/api/chat/stream`` and ``/chat/stream`` so gateways that
+    strip the ``/api`` prefix (common in some serverless setups) still route correctly.
+
     The frontend reads ``response.body`` via ``ReadableStream`` and appends chunks.
     """
-    if not _api_key():
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
-
-    messages = _openai_messages_from_request(body)
-
-    async def token_iter() -> AsyncIterator[str]:
-        try:
-            aclient = get_async_client()
-            stream = await aclient.chat.completions.create(
-                model=_model(),
-                messages=messages,
-                stream=True,
-            )
-            async for chunk in stream:
-                choice = chunk.choices[0]
-                if choice.delta and choice.delta.content:
-                    yield choice.delta.content
-        except Exception as e:
-            # After headers are sent we cannot switch to JSON; surface error as text.
-            yield f"\n\n[Stream error: {e!s}]"
-
-    return StreamingResponse(
-        token_iter(),
-        media_type="text/plain; charset=utf-8",
-    )
+    return _stream_chat_response(body)

@@ -52,12 +52,11 @@ lsof -ti:8000 | xargs kill -9
 
 ### Streaming chat (used by the Next.js UI)
 
-- **URL**: `/api/chat/stream`
-- **Method**: POST
+- **URLs**: `POST /api/chat/stream` **or** `POST /chat/stream` (same handler). The duplicate path helps when a reverse proxy or serverless host forwards requests **without** the `/api` prefix—calling only `/api/chat/stream` would otherwise return `{"detail":"Not Found"}`.
 - **Content-Type**: `application/json`
 - **Response**: `text/plain` stream of UTF-8 token chunks (read with Fetch `ReadableStream`).
 
-**Request body:**
+**Request body (full history):**
 
 ```json
 {
@@ -70,16 +69,27 @@ lsof -ti:8000 | xargs kill -9
 }
 ```
 
+**Request body (single turn — optional shorthand):**
+
+```json
+{
+  "topic": "Math",
+  "difficulty": "Intermediate",
+  "mode": "socratic",
+  "message": "Why does induction need a base case?"
+}
+```
+
 - `topic`: one of `Math`, `CS`, `History`, `Science`, `Language`
 - `difficulty`: `Beginner`, `Intermediate`, or `Expert`
-- `tutor_mode`: `socratic` (default guiding questions), `hint` (nudge without full answer), or `explanation` (direct teaching)
-- `messages`: OpenAI-style chat history (`user` / `assistant` / `system`), at least one message
+- `tutor_mode` **or** `mode`: `socratic`, `hint`, or `explanation`
+- Either `messages` (non-empty list) **or** `message` (one user string)
 
 The model name defaults to `gpt-4o-mini` and can be overridden with the `OPENAI_MODEL` environment variable.
 
 ### Chat endpoint (JSON, non-streaming)
 
-- **URL**: `/api/chat`
+- **URLs**: `POST /api/chat` **or** `POST /chat`
 - **Method**: POST
 - **Request Body**:
 ```json
@@ -102,7 +112,7 @@ This endpoint keeps a simple JSON contract for scripts and quick tests; it uses 
 - **Response**: `{"status": "ok"}`
 
 ### Health Check
-- **URL**: `/api/health`
+- **URLs**: `GET /api/health` **or** `GET /health`
 - **Method**: GET
 - **Response**: `{"status": "ok"}`
 
