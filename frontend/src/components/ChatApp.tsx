@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageBubble } from "@/components/MessageBubble";
 import { Sidebar } from "@/components/Sidebar";
 import { StreamingBubble } from "@/components/StreamingBubble";
-import { getApiBaseUrl } from "@/lib/api";
+import { getApiRequestUrl } from "@/lib/api";
 import { streamChatResponse } from "@/lib/streamChat";
 import type { ChatMessage, Difficulty, Topic, TutorMode } from "@/lib/types";
 
@@ -42,12 +42,10 @@ export function ChatApp() {
       setStreaming(true);
       setStreamingText("");
 
-      const apiBase = getApiBaseUrl();
       let accumulated = "";
 
       try {
         await streamChatResponse(
-          apiBase,
           {
             topic,
             difficulty,
@@ -192,8 +190,12 @@ export function ChatApp() {
               </button>
             </div>
             <p className="text-xs text-muted">
-              Runs against <code className="font-mono text-hint">{getApiBaseUrl()}</code> — set{" "}
-              <code className="font-mono text-hint">NEXT_PUBLIC_API_BASE_URL</code> to change it.
+              Streaming endpoint:{" "}
+              <code className="font-mono text-hint">{getApiRequestUrl("chat/stream")}</code>.
+              For local uvicorn, set{" "}
+              <code className="font-mono text-hint">NEXT_PUBLIC_API_BASE_URL</code> (e.g.{" "}
+              <code className="font-mono text-hint">http://127.0.0.1:8000</code>); if unset,
+              same-origin <code className="font-mono text-hint">/api/...</code> is used.
             </p>
           </div>
         </footer>

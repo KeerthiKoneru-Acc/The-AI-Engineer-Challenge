@@ -14,10 +14,17 @@ From the **repository root**:
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local
+# Optional: only if FastAPI runs on another origin (see below)
+# cp .env.example .env.local
 ```
 
-Edit `.env.local` if your API is not at `http://127.0.0.1:8000`.
+Edit `.env.local` only if you run the API on another origin (typical local setup):
+
+```bash
+echo 'NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000' >> .env.local
+```
+
+If you omit this variable, the browser uses same-origin URLs such as `/api/chat/stream` (for production behind a reverse proxy or Next rewrites).
 
 In one terminal, start the API (from repo root):
 
@@ -38,6 +45,6 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Deploying on Vercel
 
-Create a Vercel project with **root directory** set to `frontend`. Add an environment variable `NEXT_PUBLIC_API_BASE_URL` pointing at your deployed FastAPI origin (including scheme, no trailing slash).
+Create a Vercel project with **root directory** set to `frontend`. You usually **do not** need `NEXT_PUBLIC_API_BASE_URL` in production if your deployment routes `/api/*` to the FastAPI backend on the same host. Set it only when the API lives on a different origin (value must include the scheme, no trailing slash).
 
 The repo’s root `vercel.json` currently routes the whole project to the Python API; that layout is for the API-only template. Deploy this Next app as its own Vercel project or adjust your deployment config accordingly.

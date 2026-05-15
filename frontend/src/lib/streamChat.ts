@@ -1,3 +1,4 @@
+import { getApiRequestUrl } from "@/lib/api";
 import type { ChatMessage, Difficulty, Topic, TutorMode } from "@/lib/types";
 
 export type StreamChatPayload = {
@@ -12,12 +13,11 @@ export type StreamChatPayload = {
  * Uses the Fetch API `ReadableStream` reader (required by frontend-rule).
  */
 export async function streamChatResponse(
-  apiBaseUrl: string,
   payload: StreamChatPayload,
   onDelta: (chunk: string) => void,
   signal?: AbortSignal,
 ): Promise<void> {
-  const res = await fetch(`${apiBaseUrl}/api/chat/stream`, {
+  const res = await fetch(getApiRequestUrl("chat/stream"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
