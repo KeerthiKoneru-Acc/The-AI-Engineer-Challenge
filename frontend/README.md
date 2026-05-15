@@ -14,17 +14,15 @@ From the **repository root**:
 ```bash
 cd frontend
 npm install
-# Optional: only if FastAPI runs on another origin (see below)
-# cp .env.example .env.local
 ```
 
-Edit `.env.local` only if you run the API on another origin (typical local setup):
+Create `frontend/.env.local` with `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000` (or run the command below). **Restart `npm run dev` after changing env files** — Next only picks up `NEXT_PUBLIC_*` when the dev server starts.
 
 ```bash
-echo 'NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000' >> .env.local
+echo 'NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000' > frontend/.env.local
 ```
 
-If you omit this variable, the browser uses same-origin URLs such as `/api/chat/stream` (for production behind a reverse proxy or Next rewrites).
+If you omit `NEXT_PUBLIC_API_BASE_URL`, the browser calls same-origin paths like `/api/chat/stream`. During **`next dev` only**, `next.config.ts` **rewrites** those to `http://127.0.0.1:8000` (override with `FASTAPI_DEV_ORIGIN` if uvicorn uses another port). For **`next start`** or production, set `NEXT_PUBLIC_API_BASE_URL` or configure your host’s API rewrites.
 
 In one terminal, start the API (from repo root):
 
