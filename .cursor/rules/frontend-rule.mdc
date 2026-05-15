@@ -11,3 +11,43 @@ alwaysApply: false
 - You should use Next.js as it works best with Vercel. 
 - This frontend will ultimately be deployed on Vercel, but it should be possible to test locally. 
 - Always provide users with a way to run the created UI once you have created it.
+
+### Visual Identity
+- Style: Clean academic meets modern SaaS. Think Notion meets Linear.
+- Vibe: Focused, calm, and trustworthy — not flashy or gamified.
+
+### Color Palette
+- Background: #0F1117 (deep dark, near-black)
+- Surface/Cards: #1C1E26
+- Border: #2E3044
+- Primary Accent: #7C6AF7 (soft violet — wisdom, intellect)
+- Secondary Accent: #4ECDC4 (teal — for hints and nudges)
+- Danger/Escape hatch: #FF6B6B (for "just tell me" button)
+- Text Primary: #F0F0F5
+- Text Muted: #8B8FA8
+
+### Typography
+- Font: Inter for UI, JetBrains Mono for code blocks
+- Headings: Semi-bold, generous letter-spacing
+- Body: 16px base, 1.6 line-height for readability
+
+### Component Rules
+- Rounded corners: 12px for cards, 8px for buttons/inputs
+- Shadows: Subtle, dark-mode-friendly (no harsh drop shadows)
+- Chat bubbles: User on the right (accent-colored), tutor on the left (surface-colored)
+- Always render markdown and code blocks with syntax highlighting
+- Streaming responses should show a subtle animated cursor while loading
+- Never use default shadcn/Tailwind gray — always use the palette above
+- Prefer framer-motion for transitions and chat bubble animations
+- Streaming must be handled with the Fetch API using ReadableStream, not polling
+
+### Layout
+- Max content width: 800px centered (keeps reading comfortable)
+- Sidebar for topic/difficulty selector, main area for chat
+- Mobile responsive — stack sidebar above chat on small screens
+
+### UI Copy & Tone
+- Button labels should feel encouraging: "Give me a hint 💡" not "Hint"
+- Escape hatch button: "I give up — just tell me 🏳️"
+- Empty state: "What would you like to explore today?"
+- Avoid robotic placeholder text like "Enter message here"

@@ -1,6 +1,6 @@
 # OpenAI Chat API Backend
 
-This is a FastAPI-based backend service that provides a chat interface using OpenAI's API. The service acts as a supportive mental coach, helping users with stress, motivation, habits, and confidence.
+This is a FastAPI-based backend service that powers the **Socratic Tutor** Next.js app. It uses the OpenAI Chat Completions API with topic/difficulty-aware prompts and optional **streaming** for the frontend.
 
 ## Prerequisites
 
@@ -50,23 +50,51 @@ lsof -ti:8000 | xargs kill -9
 
 ## API Endpoints
 
-### Chat Endpoint
+### Streaming chat (used by the Next.js UI)
+
+- **URL**: `/api/chat/stream`
+- **Method**: POST
+- **Content-Type**: `application/json`
+- **Response**: `text/plain` stream of UTF-8 token chunks (read with Fetch `ReadableStream`).
+
+**Request body:**
+
+```json
+{
+  "topic": "Math",
+  "difficulty": "Intermediate",
+  "tutor_mode": "socratic",
+  "messages": [
+    { "role": "user", "content": "Why does induction need a base case?" }
+  ]
+}
+```
+
+- `topic`: one of `Math`, `CS`, `History`, `Science`, `Language`
+- `difficulty`: `Beginner`, `Intermediate`, or `Expert`
+- `tutor_mode`: `socratic` (default guiding questions), `hint` (nudge without full answer), or `explanation` (direct teaching)
+- `messages`: OpenAI-style chat history (`user` / `assistant` / `system`), at least one message
+
+The model name defaults to `gpt-4o-mini` and can be overridden with the `OPENAI_MODEL` environment variable.
+
+### Chat endpoint (JSON, non-streaming)
+
 - **URL**: `/api/chat`
 - **Method**: POST
 - **Request Body**:
 ```json
 {
-    "message": "string"
+  "message": "string"
 }
 ```
 - **Response**: JSON object with the AI's reply:
 ```json
 {
-    "reply": "string"
+  "reply": "string"
 }
 ```
 
-The chat endpoint uses OpenAI's GPT-5 model with a supportive mental coach system prompt to provide helpful responses.
+This endpoint keeps a simple JSON contract for scripts and quick tests; it uses a fixed Math / Intermediate Socratic system prompt for that single turn.
 
 ### Root Endpoint
 - **URL**: `/`
