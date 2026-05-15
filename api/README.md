@@ -1,6 +1,6 @@
 # OpenAI Chat API Backend
 
-This is a FastAPI-based backend service that powers the **Socratic Tutor** Next.js app. It uses the OpenAI Chat Completions API with topic/difficulty-aware prompts and optional **streaming** for the frontend.
+This is a FastAPI-based backend service that powers the **Socratic Tutor** Next.js app. It uses the OpenAI Chat Completions API with a **Socratic system prompt** (guided questions and hints; direct answers only after the user gives up), layered with **topic**, **difficulty**, and **tutor_mode** on each request, plus optional **streaming** for the frontend.
 
 ## Prerequisites
 

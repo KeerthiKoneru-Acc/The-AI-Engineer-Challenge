@@ -65,45 +65,67 @@ DIFFICULTIES = ("Beginner", "Intermediate", "Expert")
 TutorMode = Literal["socratic", "hint", "explanation"]
 
 
+# Core behavior for all modes; topic, difficulty, and tutor_mode add context below.
+_SOCRATIC_CORE = """You are a Socratic tutor. Your goal is to help the student discover 
+answers themselves through guided questioning.
+
+Rules:
+- NEVER give the answer directly unless the user explicitly gives up
+- Always respond with a probing question or a small hint
+- Acknowledge what the student got right before correcting mistakes
+- Adapt your language to the selected difficulty level
+- If the topic is CS, use code examples in markdown code blocks
+- When the user clicks "I give up", switch to a clear, direct explanation
+"""
+
+
 def build_system_prompt(topic: str, difficulty: str, tutor_mode: TutorMode) -> str:
     """
     Compose the system message for the Socratic tutor.
 
-    ``tutor_mode`` adjusts behavior for normal dialogue, hint-only nudges,
-    or full explanations after the learner opts in.
+    The model always receives the core Socratic rules above, plus session context
+    (subject and difficulty). ``tutor_mode`` tightens hint turns or enables full
+    explanations after the learner uses the give-up control in the UI.
     """
     if topic not in TOPICS:
         topic = "General"
     if difficulty not in DIFFICULTIES:
         difficulty = "Intermediate"
 
-    base = (
-        f"You are a patient Socratic tutor helping with **{topic}**. "
-        f"The learner is at **{difficulty}** level. "
-        "Lead with questions and short prompts that guide their reasoning. "
-        "Use Markdown when it helps (headings, lists, emphasis). "
-        "For code or formulas, use fenced code blocks with a language tag. "
-        "Stay calm, encouraging, and precise."
+    context = (
+        f"\n**Session context:** Subject: **{topic}**. Difficulty: **{difficulty}** — "
+        "match vocabulary, step size, and how much you scaffold to this level.\n"
+        "Use Markdown when it helps (headings, lists, emphasis).\n"
     )
+
+    if topic == "CS":
+        context += (
+            "The subject is **CS**: prefer short, illustrative code snippets in fenced "
+            "markdown blocks (with a language tag) when a concrete example clarifies your question or hint.\n"
+        )
+
+    if tutor_mode == "explanation":
+        return (
+            _SOCRATIC_CORE
+            + context
+            + "\n**Active mode — direct explanation:** The user has used the give-up control. "
+            "Follow the rule about giving up: switch to a **clear, direct explanation**. "
+            "You may state the full answer and walk through the reasoning step by step."
+        )
 
     if tutor_mode == "hint":
         return (
-            base
-            + " **This turn:** The learner asked for a hint. Give a *small* nudge—"
-            "enough to unblock their thinking—without stating the full answer or "
-            "final result. Prefer a question or a single partial step."
+            _SOCRATIC_CORE
+            + context
+            + "\n**This turn — hint request:** The user asked for a hint. Give only a **small** nudge "
+            "(one probing question or one tiny step). Do **not** state the complete solution or final answer."
         )
-    if tutor_mode == "explanation":
-        return (
-            base
-            + " **This turn:** The learner asked you to stop the Socratic back-and-forth "
-            "and explain directly. Give a clear, complete explanation with reasoning "
-            "and, where relevant, the final answer."
-        )
+
     return (
-        base
-        + " **Unless** the learner explicitly asks for the answer, avoid giving away "
-        "the complete solution immediately; help them discover it."
+        _SOCRATIC_CORE
+        + context
+        + "\n**Default mode:** Follow all rules strictly. Do not reveal the full answer or complete solution "
+        "unless the user has explicitly given up."
     )
 
 
