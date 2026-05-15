@@ -9,7 +9,7 @@ type Props = {
 };
 
 /**
- * In-progress assistant reply: markdown updates as chunks arrive; caret when streaming.
+ * In-progress assistant reply: markdown updates as chunks arrive; animated dots while streaming.
  */
 export function StreamingBubble({ text, streaming }: Props) {
   return (
@@ -23,7 +23,11 @@ export function StreamingBubble({ text, streaming }: Props) {
       <div className="max-w-[min(100%,36rem)] rounded-card border border-border bg-surface px-4 py-3 text-ink shadow-soft">
         {text ? <MarkdownMessage content={text} /> : null}
         {streaming ? (
-          <span className="streaming-caret mt-1 inline-block" aria-hidden />
+          <span className="streaming-dots" aria-live="polite" aria-label="Tutor is typing">
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
+          </span>
         ) : null}
       </div>
     </motion.div>
