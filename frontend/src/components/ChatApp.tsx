@@ -15,6 +15,11 @@ const EXPLAIN_USER_LINE =
 
 export function ChatApp() {
   const [topic, setTopic] = useState<Topic>("Math");
+  const handleTopicChange = (newTopic: Topic) => {
+    setTopic(newTopic);
+    setMessages([]);
+    setError(null);
+  };
   const [difficulty, setDifficulty] = useState<Difficulty>("Intermediate");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -109,7 +114,7 @@ export function ChatApp() {
       <Sidebar
         topic={topic}
         difficulty={difficulty}
-        onTopicChange={setTopic}
+        onTopicChange={handleTopicChange}
         onDifficultyChange={setDifficulty}
       />
 
