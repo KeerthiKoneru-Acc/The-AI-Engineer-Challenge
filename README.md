@@ -188,142 +188,64 @@ Think of it as a **first pass to catch obvious issues** before deeper evaluation
 
 ---
 
-## 🏗️ Activity #1: General Capability Vibe Check
+🏗️ Activity #1: General Capability Vibe Check
+1. Prompt: Explain OOP to a beginner
 
-Run the following prompts through your app.
+Aspect Tested: Explanation clarity / pedagogy
+Response: Tutor asked probing questions like "What do you think happens when we group related data together?" instead of directly explaining — true Socratic style
 
-For each prompt Identify what capability is being tested (e.g., *summarization ability, reasoning, creativity*)
+2. Prompt: Summarize a paragraph
 
----
+Aspect Tested: Comprehension / summarization
+Response: Tutor guided the user to identify key points themselves through questions
 
-**1. Prompt:**  
-Explain the concept of object-oriented programming in simple terms to a complete beginner.  
-**Aspect Tested:**  <!-- Write your answer here -->
+3. Prompt: Write a short story about a robot
 
-**Response:**  
-<!-- Add your app's response here -->
+Aspect Tested: Creativity
+Response: Not the core use case — tutor stayed in question mode (limitation)
 
----
+4. Prompt: Apple/orange packs math problem
 
-**2. Prompt:**  
-Read the following paragraph and provide a concise summary of the key points…  
-**Aspect Tested:**  
+Aspect Tested: Reasoning / math
+Response: Tutor asked "What do you know about multiples?" rather than solving directly ✅
 
-**Response:**  
-<!-- Add your app's response here -->
+5. Prompt: Rewrite paragraph formally
 
----
+Aspect Tested: Tone/style adaptation
+Response: Tutor asked what formal tone means to the user first ✅
 
-**3. Prompt:**  
-Write a short, imaginative story (100–150 words) about a robot finding friendship in an unexpected place.  
-**Aspect Tested:**  <!-- Write your answer here -->
 
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-**4. Prompt:**  
-If a store sells apples in packs of 4 and oranges in packs of 3, how many packs of each do I need to buy to get exactly 12 apples and 9 oranges?  
-**Aspect Tested:**  <!-- Write your answer here -->
-
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-**5. Prompt:**  
-Rewrite the following paragraph in a professional, formal tone…  
-**Aspect Tested:**  <!-- Write your answer here -->
-
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-### ❓Question #1
+❓Question #1
 
 Do the answers appear to be correct and useful?
 
-**Your Answer:**  
-<!-- Write your answer here -->
+Your Answer: Yes — the tutor consistently guides rather than gives answers, which is the core design goal.
 
----
+🏗️ Activity #2: Personal Use Vibe Check
+Prompt: What are quadratic equations?
+Result: Tutor asked "Can you recall what form a quadratic equation typically takes?" — correct Socratic behavior ✅
+Prompt: What are consequences of WW1?
+Result: Tutor asked about political changes in Europe, then gave a hint about specific countries when requested ✅
+Prompt: Give me a hint 💡
+Result: Gave a small nudge without revealing the full answer ✅
 
-## 🏗️ Activity #2: Personal Use Vibe Check
+❓Question #2
 
-Now test your app with **real-world prompts that are relevant to your use case**.
+Are the vibes aligned with your expectations?
 
----
+Your Answer: Yes — the tutor consistently asks guiding questions, adapts to difficulty level, and switches to explanation mode when the user gives up. Topic switching correctly clears conversation history.
 
-**Prompt:**  
-<!-- Your prompt -->
+🏗️ Activity #3: Capability Gaps Vibe Check
+Prompt: What does my schedule look like tomorrow?
+Result: Tutor has no access to personal calendars or real-time data
+Prompt: What's the latest news in science today?
+Result: No real-time web access — knowledge is limited to training data cutoff
 
-**Result:**  
-<!-- App response -->
+❓Question #3
 
----
+What are some limitations?
 
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-### ❓Question #2
-
-Are the vibes of your assistant aligned with your expectations? Why or why not?
-
-**Your Answer:**  
-<!-- Write your answer here -->
-
----
-
-## 🏗️ Activity #3: Capability Gaps Vibe Check
-
-Now test your app with prompts that require **capabilities it may not have yet**, such as:
-- Real-time data
-- Memory
-- External tools
-
-Examples:
-- “What does my schedule look like tomorrow?”
-- “What time should I leave for the airport?”
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-### ❓Question #3
-
-What are some limitations of your application?
-
-**Your Answer:**  
-<!-- Write your answer here -->
+Your Answer: No real-time data, no memory between sessions, no user accounts, and no topic enforcement — a user can ask off-topic questions and the tutor will still answer them.
 
 ---
 
